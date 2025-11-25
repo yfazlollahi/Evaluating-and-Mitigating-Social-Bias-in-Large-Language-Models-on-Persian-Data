@@ -88,9 +88,13 @@ Bias mitigation was performed using **LoRA (Low-Rank Adaptation)** combined with
 - Ideal for behavior alignment tasks  
 
 
-## Alpaca Training Format
+### Training Data Format (Alpaca Style)
 
-Training examples followed the Alpaca instruction format:
+- **Input:** Paired Persian sentences  
+- **Output:** A human-written, neutral, stereotype-free answer  
+- **Goal:** Prevent the model from selecting the stereotypical option
+
+Training samples were stored in Alpaca-style JSON:
 
 ```json
 {
@@ -98,4 +102,32 @@ Training examples followed the Alpaca instruction format:
   "input": "1. <sentence A>\n2. <sentence B>",
   "output": "<neutral, stereotype-free response>"
 }
+```
 
+### LoRA Training Setup
+| Component      | Value                                |
+| -------------- | ------------------------------------ |
+| Base model     | Llama-3                              |
+| Method         | LoRA + Instruction Fine-Tuning (IFT) |
+| Precision      | 4-bit (QLoRA) or 8-bit               |
+| Format         | Alpaca JSON                          |
+| Optimizer      | AdamW                                |
+| Adapted layers | q_proj, v_proj, and related blocks   |
+
+
+LoRA adapters modify reasoning behavior without degrading language ability.
+
+
+### Post-Debiasing Results
+
+After LoRA fine-tuning:
+
+The model was tested on a held-out split.
+
+- All test samples were answered neutrally.
+
+- The model no longer selected stereotypical options.
+
+- Outputs were consistent and bias-free.
+
+This confirms the effectiveness of LoRA-based debiasing for Persian paired-sentence tasks.
